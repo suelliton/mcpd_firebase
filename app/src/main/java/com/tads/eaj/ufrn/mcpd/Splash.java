@@ -32,7 +32,7 @@ public class Splash extends AppCompatActivity {
         setContentView(R.layout.activity_splash);
 
         database = FirebaseDatabase.getInstance();
-
+        FirebaseDatabase.getInstance().setPersistenceEnabled(true);//persistencia em disco local
         culturaReference = database.getReference().child("Cultura");
         pragaReference = database.getReference().child("Praga");
         usuarioReference = database.getReference().child("Usuario");

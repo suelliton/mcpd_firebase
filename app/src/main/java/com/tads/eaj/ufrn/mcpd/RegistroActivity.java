@@ -26,8 +26,10 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.tads.eaj.ufrn.mcpd.adapters.CulturaAdapter;
 import com.tads.eaj.ufrn.mcpd.adapters.PermissionUtils;
+import com.tads.eaj.ufrn.mcpd.adapters.PragaAdapter;
 import com.tads.eaj.ufrn.mcpd.model.Cultura;
 import com.tads.eaj.ufrn.mcpd.model.Praga;
 import com.tads.eaj.ufrn.mcpd.model.Registro;
@@ -46,9 +48,12 @@ import static com.tads.eaj.ufrn.mcpd.ConsultaRegistrosActivity.RESULT_EXIT;
 public class RegistroActivity extends AppCompatActivity {
     private FirebaseDatabase database ;
     private DatabaseReference culturaReference;
-    private ChildEventListener mChildEventListener;
+    private DatabaseReference pragaReference;
+    private ChildEventListener childEventCultura;
+    private ChildEventListener childEventPraga;
 
     CulturaAdapter adaptador_cultura;
+    PragaAdapter adaptador_praga;
     Registro registroAtual;
     private EditText tratamento;
     private RadioGroup radioGroup_escala,radioGroup_tratamento;
@@ -71,7 +76,7 @@ public class RegistroActivity extends AppCompatActivity {
         recebePropriedade();
         database = FirebaseDatabase.getInstance();
         culturaReference = database.getReference().child("Cultura");
-
+        pragaReference = database.getReference().child("Praga");
         registroAtual = new Registro();
 
         bindViews();
@@ -109,7 +114,7 @@ public class RegistroActivity extends AppCompatActivity {
         //seta o adapter no spinner
         spinner_cultura.setAdapter(adaptador_cultura);
         //recupera todas as culturas do banco
-         mChildEventListener = culturaReference.child("nome").orderByChild("nome").addChildEventListener(new ChildEventListener() {
+         childEventCultura = culturaReference.child("nome").orderByChild("nome").addChildEventListener(new ChildEventListener() {
              @Override
              public void onChildAdded(DataSnapshot dataSnapshot, String s) {
              Cultura cultura =  dataSnapshot.getValue(Cultura.class);
@@ -138,31 +143,50 @@ public class RegistroActivity extends AppCompatActivity {
 
              }
          });
-        culturaReference.addChildEventListener(mChildEventListener);
+        culturaReference.addChildEventListener(childEventCultura);
+
+
+        final List<Praga> listaPragas= new ArrayList<>();
+        //joga as culturas pro adapter
+        adaptador_praga = new PragaAdapter(this, listaPragas);
+        //seta o adapter no spinner
+        spinner_praga.setAdapter(adaptador_praga);
 
         //trata o clique na cultura do spinner
         spinner_cultura.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-               /* switch(i){
-                    case 1:
-                        registroAtual.setCulturaId(i);//salva o id da cultura no registro
-                        //recupera todas as pragas do banco de acordo com a cultura selecionada no spinner
-                        List<Praga> listaPragas = bancoHelper.findAllPragas(); //execSQL("select from Praga where Praga.idCultura=1");
-                        ArrayAdapter adaptador_praga = new ArrayAdapter(RegistroActivity.this,android.R.layout.simple_spinner_item,convertePraga(listaPragas));
-                        spinner_praga.setAdapter(adaptador_praga);
-                        break;
-                    case 2:
-                        registroAtual.setCulturaId(i);//salva o id da cultura no registro
-                        //recupera todas as pragas do banco de acordo com a cultura selecionada no spinner
-                        List<Praga> listaPragas2 = bancoHelper.findAllPragas(); //execSQL("select from Praga where Praga.idCultura=2") ;
-                        ArrayAdapter adaptador_praga2 = new ArrayAdapter(RegistroActivity.this,android.R.layout.simple_spinner_item,convertePraga(listaPragas2));
-                        spinner_praga.setAdapter(adaptador_praga2);
-                        break;
+            public void onItemSelected(AdapterView<?> adapterView, View view, final int i, long l) {
+                childEventPraga =  pragaReference.orderByChild("nome").addChildEventListener(new ChildEventListener(){
+                     @Override
+                     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                         Praga praga =  dataSnapshot.getValue(Praga.class);
+                         Cultura culturaClicada = (Cultura) adaptador_cultura.getItem(i);//cultura clicada
+                         listaPragas.add(praga);
+                         adaptador_praga.notifyDataSetChanged();
+                     }
 
+                     @Override
+                     public void onChildChanged(DataSnapshot dataSnapshot, String s) {
 
-                }
-*/
+                     }
+
+                     @Override
+                     public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+                     }
+
+                     @Override
+                     public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                     }
+
+                     @Override
+                     public void onCancelled(DatabaseError databaseError) {
+
+                     }
+                 });
+                pragaReference.addChildEventListener(childEventPraga);
+
 
                 spinner_praga.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     @Override
