@@ -24,6 +24,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
+import static com.tads.eaj.ufrn.mcpd.RegistroActivity.listaCulturas;
+import static com.tads.eaj.ufrn.mcpd.RegistroActivity.listaPragas;
+
 /**
  * Created by suelitton on 14/10/2017.
  * Adapted by Jofrey on 17/07/2017.
@@ -56,8 +59,8 @@ public class RegistroAdapter extends RecyclerView.Adapter {
 
         //objetos apenas para testes esses valores vao ser pegados diretamente pelo objeto registro quando tudo estiver no banco
 
-        Cultura c1 = new Cultura(1,"Cacau","é um cacaueiro");
-        Praga p1 = new Praga(1,"Vassoura da bruxa","1","2","3","4","5",1);
+        Cultura c1 = listaCulturas.get(registroEscolhido.getCulturaId())  ;
+        Praga p1 = listaPragas.get(registroEscolhido.getPragaId());
         if(position != 0){
             registroholder.label_esc.setVisibility(View.INVISIBLE);
             registroholder.label_dataHora.setVisibility(View.INVISIBLE);

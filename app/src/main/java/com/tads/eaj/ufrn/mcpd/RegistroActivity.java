@@ -41,8 +41,10 @@ import java.util.Date;
 import java.util.List;
 
 
+import static com.tads.eaj.ufrn.mcpd.ConsultaRegistrosActivity.REGISTRO_PARA_EDITAR;
 import static com.tads.eaj.ufrn.mcpd.ConsultaRegistrosActivity.RESULT_EDIT;
 import static com.tads.eaj.ufrn.mcpd.ConsultaRegistrosActivity.RESULT_EXIT;
+
 
 
 public class RegistroActivity extends AppCompatActivity {
@@ -51,6 +53,12 @@ public class RegistroActivity extends AppCompatActivity {
     private DatabaseReference pragaReference;
     private ChildEventListener childEventCultura;
     private ChildEventListener childEventPraga;
+    private ChildEventListener childEventRegistro;
+    private DatabaseReference registroReference;
+
+    public static List<Cultura> listaCulturas;
+    public static List<Praga> listaPragas;
+    List<Registro> listaRegistros  = new ArrayList<>();
 
     CulturaAdapter adaptador_cultura;
     PragaAdapter adaptador_praga;
@@ -74,9 +82,11 @@ public class RegistroActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registro);
         recebePropriedade();
+        REGISTRO_PARA_EDITAR = null;
         database = FirebaseDatabase.getInstance();
         culturaReference = database.getReference().child("Cultura");
         pragaReference = database.getReference().child("Praga");
+        registroReference = database.getReference().child("Registro");
         registroAtual = new Registro();
 
         bindViews();
@@ -108,7 +118,7 @@ public class RegistroActivity extends AppCompatActivity {
 
     public void setListeners() {
 
-        final List<Cultura> listaCulturas= new ArrayList<>();
+         listaCulturas= new ArrayList<>();
         //joga as culturas pro adapter
          adaptador_cultura = new CulturaAdapter(this, listaCulturas);
         //seta o adapter no spinner
@@ -146,62 +156,21 @@ public class RegistroActivity extends AppCompatActivity {
         culturaReference.addChildEventListener(childEventCultura);
 
 
-        final List<Praga> listaPragas= new ArrayList<>();
+        listaPragas= new ArrayList<>();
         //joga as culturas pro adapter
         adaptador_praga = new PragaAdapter(this, listaPragas);
         //seta o adapter no spinner
         spinner_praga.setAdapter(adaptador_praga);
 
+
+
         //trata o clique na cultura do spinner
         spinner_cultura.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, final int i, long l) {
-                childEventPraga =  pragaReference.orderByChild("nome").addChildEventListener(new ChildEventListener(){
-                     @Override
-                     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                         Praga praga =  dataSnapshot.getValue(Praga.class);
-                         Cultura culturaClicada = (Cultura) adaptador_cultura.getItem(i);//cultura clicada
-                         listaPragas.add(praga);
-                         adaptador_praga.notifyDataSetChanged();
-                     }
-
-                     @Override
-                     public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-                     }
-
-                     @Override
-                     public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-                     }
-
-                     @Override
-                     public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-                     }
-
-                     @Override
-                     public void onCancelled(DatabaseError databaseError) {
-
-                     }
-                 });
-                pragaReference.addChildEventListener(childEventPraga);
-
-
-                spinner_praga.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                    @Override
-                    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                        registroAtual.setPragaId(i);
-                    }
-
-                    @Override
-                    public void onNothingSelected(AdapterView<?> adapterView) {
-
-                    }
-                });
-
-
-
+               // long idCultura = listaCulturas.get(i).getId();
+                registroAtual.setCulturaId( i);
+                Log.i("clicou","na cultura "+ i);
             }
 
             @Override
@@ -209,6 +178,57 @@ public class RegistroActivity extends AppCompatActivity {
 
             }
         }) ;
+        //preenche o spinner praga
+        childEventPraga =  pragaReference.child("nome").addChildEventListener(new ChildEventListener(){
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                Praga praga =  dataSnapshot.getValue(Praga.class);
+                //Cultura culturaClicada = (Cultura) adaptador_cultura.getItem(i);//cultura clicada
+                listaPragas.add(praga);
+                adaptador_praga.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        pragaReference.addChildEventListener(childEventPraga);
+
+        //trato clique em spinner praga
+        spinner_praga.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                //long idPraga = listaPragas.get(i).getId();
+                registroAtual.setPragaId(i);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+
+
+
+
+
 
 
 
@@ -234,33 +254,14 @@ public class RegistroActivity extends AppCompatActivity {
         tratamento.setVisibility(View.GONE);
         radio_tratamento_nao.toggle();
 
+        RadioButton radioButton3 = (RadioButton) findViewById(R.id.sev_03);
+        radioButton3.toggle();
 
-        //radiobuttons escala
 
-        //define estado padrao inicial
-        RadioButton radio_3 = (RadioButton) findViewById(R.id.sev_03);
-        radio_3.toggle();
+
         //registroAtual.setEscala(3);
 
-        switch (radioGroup_escala.getCheckedRadioButtonId()){
 
-            case R.id.sev_01:
-                    registroAtual.setEscala(1);
-                break;
-            case R.id.sev_02:
-                registroAtual.setEscala(2);
-                break;
-            case R.id.sev_03:
-                registroAtual.setEscala(3);
-                break;
-            case R.id.sev_04:
-                registroAtual.setEscala(4);
-                break;
-            case R.id.sev_05:
-                registroAtual.setEscala(5);
-                break;
-            default:
-        }
 
 
 
@@ -376,12 +377,14 @@ public class RegistroActivity extends AppCompatActivity {
 
     }
 
-    /*public void editaRegistro(int id_edit){
-        List<Registro> listaRegistros = bancoHelper.findAllRegistros();
-        registroAtual = listaRegistros.get(id_edit);
+    public void setaRegistro(int id_edit){
+
+        registroAtual = REGISTRO_PARA_EDITAR;
         tratamento.setText(registroAtual.getTipo());
+        EditText obs = (EditText) findViewById(R.id.observacoes);
+        obs.setText(registroAtual.getObs());
         RadioButton radio;
-        Log.i("escala",registroAtual.getEscala()+"");
+
 
         switch (registroAtual.getEscala()){
 
@@ -413,7 +416,7 @@ public class RegistroActivity extends AppCompatActivity {
 
 
     }
-*/
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -422,7 +425,7 @@ public class RegistroActivity extends AppCompatActivity {
                 Bundle bundle = data.getExtras();
                 int id_edit = bundle.getInt("id_edit",0);
                 Log.i("id_edit",id_edit+"");
-               // editaRegistro(id_edit);
+                setaRegistro(id_edit);
             } else if (resultCode == RESULT_EXIT) {
                 finish();
             }else if(resultCode == RESULT_CANCELED){
@@ -491,25 +494,82 @@ public class RegistroActivity extends AppCompatActivity {
 
    public void  salvarRegistro(){
 
+       if(REGISTRO_PARA_EDITAR == null){
+           switch (radioGroup_escala.getCheckedRadioButtonId()){
+               case R.id.sev_01:
+                   registroAtual.setEscala(1);
+                   Log.i("clicou","no um");
+                   break;
+               case R.id.sev_02:
+                   registroAtual.setEscala(2);
+                   break;
+               case R.id.sev_03:
+                   registroAtual.setEscala(3);
+                   break;
+               case R.id.sev_04:
+                   registroAtual.setEscala(4);
+                   break;
+               case R.id.sev_05:
+                   registroAtual.setEscala(5);
+                   break;
+               default:
+           }
+           EditText observacoes = (EditText) findViewById(R.id.observacoes);
+           registroAtual.setObs(observacoes.getText().toString());
+           EditText tratamento = (EditText) findViewById(R.id.tratamento);
+           registroAtual.setTipo(tratamento.getText().toString());
+           registroAtual.setDataRegistro(getDataAtual());
+           registroAtual.setDataTratamento(getDataAtual());
+           registroAtual.setLatitude(getLatitude());
+           registroAtual.setLongitude(getLongitude());
+           registroAtual.setUsuarioId(1);
+           registroReference.push().setValue(registroAtual);
+           Toast.makeText(this, "Dados salvos :"+registroAtual.toString(),  Toast.LENGTH_SHORT).show();
+       }else{
 
-       EditText observacoes = (EditText) findViewById(R.id.observacoes);
-       registroAtual.setObs(observacoes.getText().toString());
-
-       EditText tratamento = (EditText) findViewById(R.id.tratamento);
-       registroAtual.setTipo(tratamento.getText().toString());
+           childEventRegistro = registroReference.child("dataRegistro").child(REGISTRO_PARA_EDITAR.getDataRegistro()).orderByChild("dataRegistro").addChildEventListener(new ChildEventListener() {
+               @Override
+               public void onChildAdded(DataSnapshot dataSnapshot, String s) {
 
 
-       registroAtual.setDataRegistro(getDataAtual());
-       registroAtual.setDataTratamento(getDataAtual());
+               }
+
+               @Override
+               public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+               }
+
+               @Override
+               public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+               }
+
+               @Override
+               public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+               }
+
+               @Override
+               public void onCancelled(DatabaseError databaseError) {
+
+               }
+           });
+           registroReference.addChildEventListener(childEventRegistro);
 
 
 
-       registroAtual.setLatitude(getLatitude());
-       registroAtual.setLongitude(getLongitude());
 
-       registroAtual.setUsuarioId(1);
 
-       Toast.makeText(this, "Dados salvos :"+registroAtual.toString(),  Toast.LENGTH_SHORT).show();
+
+
+
+
+
+
+       }
+
+
+
    }
 
 }

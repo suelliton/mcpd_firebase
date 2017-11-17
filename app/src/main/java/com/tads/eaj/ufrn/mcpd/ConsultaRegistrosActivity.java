@@ -5,10 +5,17 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.tads.eaj.ufrn.mcpd.adapters.RegistroAdapter;
+import com.tads.eaj.ufrn.mcpd.model.Cultura;
 import com.tads.eaj.ufrn.mcpd.model.Registro;
 
 import java.util.ArrayList;
@@ -17,27 +24,68 @@ import java.util.List;
 
 public class ConsultaRegistrosActivity extends AppCompatActivity{
     List<Registro> listaRegistros  = new ArrayList<>();
+    static Registro REGISTRO_PARA_EDITAR;
 
     final static int RESULT_EDIT = 1;
     final static int RESULT_EXIT = 2;
     Button btnConsulta;
     Button btn_Sair;
     Button  btn_Apontamentos;
-
-
+    private FirebaseDatabase database ;
+    private DatabaseReference registroReference ;
+    private ChildEventListener childEventRegistro;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_consulta_registros);
-        //preencheRegistros();
-        //BancoHelper bd = new BancoHelper(this);
-        //listaRegistros = bd.findAllRegistros();
+        database =  FirebaseDatabase.getInstance();
+        registroReference = database.getReference("Registro");
+        final List<Registro> listaRegistros = new ArrayList<>();
+        final RegistroAdapter registroAdapter = new RegistroAdapter(this,listaRegistros);
 
-
-
-        RegistroAdapter registroAdapter = new RegistroAdapter(this,listaRegistros);
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_consulta_registros);
+        final RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_consulta_registros);
         recyclerView.setAdapter(registroAdapter);
+
+
+        childEventRegistro = registroReference.child("dataRegistro").orderByChild("dataRegistro").addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                Registro registro =  dataSnapshot.getValue(Registro.class);
+                listaRegistros.add(registro);
+                registroAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        registroReference.addChildEventListener(childEventRegistro);
+
+
+
+
+
+
+
+
+
+
         RecyclerView.LayoutManager layout = new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false);
         recyclerView.setLayoutManager(layout);
 
@@ -48,7 +96,9 @@ public class ConsultaRegistrosActivity extends AppCompatActivity{
             public void OnItemClick(View view, int i) {
                 Intent intent= new Intent();
                 Bundle bundle = new Bundle();
-                bundle.putInt("id_edit",i);
+                Registro registro = listaRegistros.get(i) ;
+                REGISTRO_PARA_EDITAR = registro;
+
                 intent.putExtras(bundle);
                 setResult(RESULT_EDIT,intent);
                 finish();
