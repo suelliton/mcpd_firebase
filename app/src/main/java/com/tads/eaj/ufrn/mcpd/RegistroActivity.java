@@ -5,7 +5,9 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.net.Uri;
+import android.provider.MediaStore;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -16,6 +18,9 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
@@ -31,6 +36,7 @@ import com.tads.eaj.ufrn.mcpd.adapters.CulturaAdapter;
 import com.tads.eaj.ufrn.mcpd.adapters.PermissionUtils;
 import com.tads.eaj.ufrn.mcpd.adapters.PragaAdapter;
 import com.tads.eaj.ufrn.mcpd.model.Cultura;
+import com.tads.eaj.ufrn.mcpd.model.Galeria;
 import com.tads.eaj.ufrn.mcpd.model.Praga;
 import com.tads.eaj.ufrn.mcpd.model.Registro;
 
@@ -48,6 +54,12 @@ import static com.tads.eaj.ufrn.mcpd.ConsultaRegistrosActivity.RESULT_EXIT;
 
 
 public class RegistroActivity extends AppCompatActivity {
+    //Captura de Tela
+    static final int REQUEST_IMAGE_CAPTURE = 1;
+    private ImageView ivPhoto;
+    private ImageButton btTakeaaPhoto;
+    private ImageView mImgExemplo;
+
     private FirebaseDatabase database ;
     private DatabaseReference culturaReference;
     private DatabaseReference pragaReference;
@@ -93,7 +105,18 @@ public class RegistroActivity extends AppCompatActivity {
         setListeners();
         //controlaBotoes(false);
 
+        //Captura de Imagem
+        btTakeaaPhoto = (ImageButton) findViewById(R.id.img_amostra);
+
+
+        btTakeaaPhoto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dispatchTakePictureIntent();
+            }
+        });
     }
+
 
     public void recebePropriedade() {
         Bundle bundle = getIntent().getExtras();
@@ -113,7 +136,44 @@ public class RegistroActivity extends AppCompatActivity {
         radioGroup_escala = (RadioGroup) findViewById(R.id.radioGroup_escala);
         radioGroup_tratamento= (RadioGroup) findViewById(R.id.radioGroup_tratamento);
         tratamento = (EditText) findViewById(R.id.tratamento);
-
+        //radiobuttons escala
+        final Galeria galeria = new Galeria("cacau_pulgoes", this);
+        mImgExemplo= (ImageView) findViewById(R.id.img_exemplo);
+        RadioButton radSev_01 = (RadioButton) findViewById(R.id.sev_01);
+        radSev_01.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mImgExemplo.setImageBitmap(galeria.getImage(1));
+            }
+        });
+        RadioButton radSev_02 = (RadioButton) findViewById(R.id.sev_02);
+        radSev_02.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mImgExemplo.setImageBitmap(galeria.getImage(2));
+            }
+        });
+        RadioButton radSev_03 = (RadioButton) findViewById(R.id.sev_03);
+        radSev_03.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mImgExemplo.setImageBitmap(galeria.getImage(3));
+            }
+        });
+        RadioButton radSev_04 = (RadioButton) findViewById(R.id.sev_04);
+        radSev_04.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mImgExemplo.setImageBitmap(galeria.getImage(4));
+            }
+        });
+        RadioButton radSev_05 = (RadioButton) findViewById(R.id.sev_05);
+        radSev_05.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mImgExemplo.setImageBitmap(galeria.getImage(5));
+            }
+        });
     }
 
     public void setListeners() {
@@ -417,22 +477,22 @@ public class RegistroActivity extends AppCompatActivity {
 
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_CONSULT) {
-            if (resultCode == RESULT_EDIT) {
-                Bundle bundle = data.getExtras();
-                int id_edit = bundle.getInt("id_edit",0);
-                Log.i("id_edit",id_edit+"");
-                setaRegistro(id_edit);
-            } else if (resultCode == RESULT_EXIT) {
-                finish();
-            }else if(resultCode == RESULT_CANCELED){
-                Toast.makeText(RegistroActivity.this, "Operação cancelada", Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+//        if (requestCode == REQUEST_CONSULT) {
+//            if (resultCode == RESULT_EDIT) {
+//                Bundle bundle = data.getExtras();
+//                int id_edit = bundle.getInt("id_edit",0);
+//                Log.i("id_edit",id_edit+"");
+//                setaRegistro(id_edit);
+//            } else if (resultCode == RESULT_EXIT) {
+//                finish();
+//            }else if(resultCode == RESULT_CANCELED){
+//                Toast.makeText(RegistroActivity.this, "Operação cancelada", Toast.LENGTH_SHORT).show();
+//            }
+//        }
+//    }
     @Override
     protected void onStart() {
         super.onStart();
@@ -555,21 +615,26 @@ public class RegistroActivity extends AppCompatActivity {
                }
            });
            registroReference.addChildEventListener(childEventRegistro);
-
-
-
-
-
-
-
-
-
-
-
        }
-
-
-
    }
 
+
+   //Métodos captura de imagem
+   //Captura de imagem
+   private void dispatchTakePictureIntent() {
+       Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+       if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+           startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+       }
+   }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            Bundle extras = data.getExtras();
+            Bitmap imageBitmap = (Bitmap) extras.get("data");
+            btTakeaaPhoto.setScaleType(ImageView.ScaleType.FIT_CENTER);
+            //android:scaleType="fitEnd"
+            btTakeaaPhoto.setImageBitmap(imageBitmap);
+        }
+    }
 }
