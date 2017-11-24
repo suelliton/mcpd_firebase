@@ -477,22 +477,22 @@ public class RegistroActivity extends AppCompatActivity {
 
     }
 
-//    @Override
-//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        super.onActivityResult(requestCode, resultCode, data);
-//        if (requestCode == REQUEST_CONSULT) {
-//            if (resultCode == RESULT_EDIT) {
-//                Bundle bundle = data.getExtras();
-//                int id_edit = bundle.getInt("id_edit",0);
-//                Log.i("id_edit",id_edit+"");
-//                setaRegistro(id_edit);
-//            } else if (resultCode == RESULT_EXIT) {
-//                finish();
-//            }else if(resultCode == RESULT_CANCELED){
-//                Toast.makeText(RegistroActivity.this, "Operação cancelada", Toast.LENGTH_SHORT).show();
-//            }
-//        }
-//    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CONSULT) {
+            if (resultCode == RESULT_EDIT) {
+                Bundle bundle = data.getExtras();
+                int id_edit = bundle.getInt("id_edit",0);
+                Log.i("id_edit",id_edit+"");
+                setaRegistro(id_edit);
+            } else if (resultCode == RESULT_EXIT) {
+                finish();
+            }else if(resultCode == RESULT_CANCELED){
+                Toast.makeText(RegistroActivity.this, "Operação cancelada", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
     @Override
     protected void onStart() {
         super.onStart();
@@ -627,14 +627,14 @@ public class RegistroActivity extends AppCompatActivity {
            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
        }
    }
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            Bundle extras = data.getExtras();
-            Bitmap imageBitmap = (Bitmap) extras.get("data");
-            btTakeaaPhoto.setScaleType(ImageView.ScaleType.FIT_CENTER);
-            //android:scaleType="fitEnd"
-            btTakeaaPhoto.setImageBitmap(imageBitmap);
-        }
-    }
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+//            Bundle extras = data.getExtras();
+//            Bitmap imageBitmap = (Bitmap) extras.get("data");
+//            btTakeaaPhoto.setScaleType(ImageView.ScaleType.FIT_CENTER);
+//            //android:scaleType="fitEnd"
+//            btTakeaaPhoto.setImageBitmap(imageBitmap);
+//        }
+//    }
 }
