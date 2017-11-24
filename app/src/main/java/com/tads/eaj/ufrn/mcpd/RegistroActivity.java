@@ -139,6 +139,7 @@ public class RegistroActivity extends AppCompatActivity {
         //radiobuttons escala
         final Galeria galeria = new Galeria("cacau_pulgoes", this);
         mImgExemplo= (ImageView) findViewById(R.id.img_exemplo);
+
         RadioButton radSev_01 = (RadioButton) findViewById(R.id.sev_01);
         radSev_01.setOnClickListener(new View.OnClickListener() {
             @Override
