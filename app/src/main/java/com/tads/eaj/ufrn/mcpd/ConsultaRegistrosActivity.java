@@ -14,6 +14,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.tads.eaj.ufrn.mcpd.adapters.RegistroAdapter;
 import com.tads.eaj.ufrn.mcpd.model.Cultura;
 import com.tads.eaj.ufrn.mcpd.model.Registro;
@@ -23,7 +24,8 @@ import java.util.List;
 
 
 public class ConsultaRegistrosActivity extends AppCompatActivity{
-    List<Registro> listaRegistros  = new ArrayList<>();
+
+    static String keyParaEditar;
     static Registro REGISTRO_PARA_EDITAR;
 
     final static int RESULT_EDIT = 1;
@@ -34,23 +36,37 @@ public class ConsultaRegistrosActivity extends AppCompatActivity{
     private FirebaseDatabase database ;
     private DatabaseReference registroReference ;
     private ChildEventListener childEventRegistro;
+    private ValueEventListener childValueRegistro;
+    List<Registro> listaRegistros;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_consulta_registros);
         database =  FirebaseDatabase.getInstance();
         registroReference = database.getReference("Registro");
-        final List<Registro> listaRegistros = new ArrayList<>();
+        listaRegistros = new ArrayList<>();
         final RegistroAdapter registroAdapter = new RegistroAdapter(this,listaRegistros);
 
         final RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_consulta_registros);
         recyclerView.setAdapter(registroAdapter);
 
 
+
+       /* for (DataSnapshot snapshot:dataSnapshot.getChildren()) {
+
+            Registro registro =  dataSnapshot.getValue(Registro.class);
+            registro.setKey(snapshot.getKey());
+            listaRegistros.add(registro);
+            registroAdapter.notifyDataSetChanged();
+
+        }*/
+
+
         childEventRegistro = registroReference.child("dataRegistro").orderByChild("dataRegistro").addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 Registro registro =  dataSnapshot.getValue(Registro.class);
+                registro.setKey(dataSnapshot.getKey());
                 listaRegistros.add(registro);
                 registroAdapter.notifyDataSetChanged();
             }
@@ -83,9 +99,6 @@ public class ConsultaRegistrosActivity extends AppCompatActivity{
 
 
 
-
-
-
         RecyclerView.LayoutManager layout = new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false);
         recyclerView.setLayoutManager(layout);
 
@@ -97,8 +110,8 @@ public class ConsultaRegistrosActivity extends AppCompatActivity{
                 Intent intent= new Intent();
                 Bundle bundle = new Bundle();
                 Registro registro = listaRegistros.get(i) ;
+                keyParaEditar = registro.getKey();
                 REGISTRO_PARA_EDITAR = registro;
-
                 intent.putExtras(bundle);
                 setResult(RESULT_EDIT,intent);
                 finish();

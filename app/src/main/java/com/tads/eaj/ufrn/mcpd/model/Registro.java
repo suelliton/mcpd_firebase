@@ -7,6 +7,15 @@ import java.util.Date;
 public class Registro  extends SugarRecord {
 
 	private long id;
+	private String key;
+
+	public String getKey() {
+		return key;
+	}
+
+	public void setKey(String key) {
+		this.key = key;
+	}
 
 	private String dataRegistro;
 
