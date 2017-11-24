@@ -480,6 +480,12 @@ public class RegistroActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            Bundle extras = data.getExtras();
+            Bitmap imageBitmap = (Bitmap) extras.get("data");
+            btTakeaaPhoto.setScaleType(ImageView.ScaleType.FIT_CENTER);
+            btTakeaaPhoto.setImageBitmap(imageBitmap);
+        }
         if (requestCode == REQUEST_CONSULT) {
             if (resultCode == RESULT_EDIT) {
                 Bundle bundle = data.getExtras();
@@ -627,14 +633,4 @@ public class RegistroActivity extends AppCompatActivity {
            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
        }
    }
-//    @Override
-//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-//            Bundle extras = data.getExtras();
-//            Bitmap imageBitmap = (Bitmap) extras.get("data");
-//            btTakeaaPhoto.setScaleType(ImageView.ScaleType.FIT_CENTER);
-//            //android:scaleType="fitEnd"
-//            btTakeaaPhoto.setImageBitmap(imageBitmap);
-//        }
-//    }
 }
