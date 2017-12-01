@@ -12,13 +12,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:padding="@dimen/margin"
+
         style="@style/Theme.AppCompat.DayNight.NoActionBar"
         tools:context="com.tads.eaj.ufrn.mcpd.RegistroActivity">
 
         <LinearLayout
             android:id="@+id/linearLayout5"
-            android:layout_width="368dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_gravity="center"

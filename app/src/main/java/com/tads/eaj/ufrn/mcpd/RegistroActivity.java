@@ -494,7 +494,7 @@ public class RegistroActivity extends AppCompatActivity {
             } else if (resultCode == RESULT_EXIT) {
                 finish();
             }else if(resultCode == RESULT_CANCELED){
-                Toast.makeText(RegistroActivity.this, "Operação cancelada", Toast.LENGTH_SHORT).show();
+
             }
         }
     }
