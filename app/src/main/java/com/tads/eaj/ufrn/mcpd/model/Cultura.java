@@ -5,8 +5,16 @@ import com.orm.SugarRecord;
 public class Cultura extends SugarRecord {
 
 	private long id;
-
+	private String key;
 	private String nome;
+
+	public String getKey() {
+		return key;
+	}
+
+	public void setKey(String key) {
+		this.key = key;
+	}
 
 	private String descricao;
 

@@ -68,6 +68,9 @@ public class RegistroActivity extends AppCompatActivity {
     private ChildEventListener childEventRegistro;
     private DatabaseReference registroReference;
 
+    private ValueEventListener childValueCultura;
+    private ValueEventListener childValuePraga;
+
     public static List<Cultura> listaCulturas;
     public static List<Praga> listaPragas;
     List<Registro> listaRegistros  = new ArrayList<>();
@@ -83,6 +86,8 @@ public class RegistroActivity extends AppCompatActivity {
     private int ID_EDIT;
     private Long ID_PROPRIEDADE;
     private int contGps=0;
+
+    long culturaClicada = 2;
     GPSTracker  gps = new GPSTracker(RegistroActivity.this);
     final String[] permissoes = new String[]{
             Manifest.permission.ACCESS_COARSE_LOCATION,
@@ -124,6 +129,11 @@ public class RegistroActivity extends AppCompatActivity {
         Toast.makeText(this, "id propriedade = " + ID_PROPRIEDADE, Toast.LENGTH_SHORT).show();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        setListeners();
+    }
 
     public void bindViews() {
         btnConsulta = (Button) findViewById(R.id.btn_consultar);
@@ -185,36 +195,25 @@ public class RegistroActivity extends AppCompatActivity {
         //seta o adapter no spinner
         spinner_cultura.setAdapter(adaptador_cultura);
         //recupera todas as culturas do banco
-         childEventCultura = culturaReference.child("nome").orderByChild("nome").addChildEventListener(new ChildEventListener() {
-             @Override
-             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-             Cultura cultura =  dataSnapshot.getValue(Cultura.class);
-                 listaCulturas.add(cultura);
-                 adaptador_cultura.notifyDataSetChanged();
-                 //Log.i("firebase",cultura.toString());
-             }
 
-             @Override
-             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+        childValueCultura = culturaReference.child("/Cultura").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                listaCulturas.removeAll(listaCulturas);
+                for (DataSnapshot snapshot:dataSnapshot.getChildren()) {
+                    Cultura cultura = snapshot.getValue(Cultura.class);//pega o objeto do firebase
+                    listaCulturas.add(cultura);//adiciona na lista que vai para o adapter
+                    Log.i("c",cultura.getNome()+"");
+                }
+                adaptador_cultura.notifyDataSetChanged();
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        });
+        culturaReference.addValueEventListener(childValueCultura);
 
-             }
 
-             @Override
-             public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-             }
-
-             @Override
-             public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-             }
-
-             @Override
-             public void onCancelled(DatabaseError databaseError) {
-
-             }
-         });
-        culturaReference.addChildEventListener(childEventCultura);
 
 
         listaPragas= new ArrayList<>();
@@ -231,7 +230,27 @@ public class RegistroActivity extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> adapterView, View view, final int i, long l) {
                // long idCultura = listaCulturas.get(i).getId();
                 registroAtual.setCulturaId( i);
+                culturaClicada = i;
                 Log.i("clicou","na cultura "+ i);
+
+                childValuePraga = pragaReference.child("Praga").addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        listaPragas.removeAll(listaPragas);
+                        for (DataSnapshot snapshot:dataSnapshot.getChildren()) {
+                            Praga praga = snapshot.getValue(Praga.class);//pega o objeto do firebase
+                            if(praga.getIdCultura() == culturaClicada){
+                                listaPragas.add(praga);//adiciona na lista que vai para o adapter
+                                Log.i("c",praga.getNome()+"");
+                            }
+                        }
+                        adaptador_praga.notifyDataSetChanged();
+                    }
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                    }
+                });
+                pragaReference.addValueEventListener(childValuePraga);
             }
 
             @Override
@@ -240,36 +259,13 @@ public class RegistroActivity extends AppCompatActivity {
             }
         }) ;
         //preenche o spinner praga
-        childEventPraga =  pragaReference.child("nome").addChildEventListener(new ChildEventListener(){
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                Praga praga =  dataSnapshot.getValue(Praga.class);
-                //Cultura culturaClicada = (Cultura) adaptador_cultura.getItem(i);//cultura clicada
-                listaPragas.add(praga);
-                adaptador_praga.notifyDataSetChanged();
-            }
 
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
 
-            }
 
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
 
-            }
 
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
 
-            }
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-        pragaReference.addChildEventListener(childEventPraga);
 
         //trato clique em spinner praga
         spinner_praga.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
