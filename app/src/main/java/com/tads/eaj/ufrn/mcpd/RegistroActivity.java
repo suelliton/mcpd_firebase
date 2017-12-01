@@ -148,7 +148,7 @@ public class RegistroActivity extends AppCompatActivity {
         radioGroup_tratamento= (RadioGroup) findViewById(R.id.radioGroup_tratamento);
         tratamento = (EditText) findViewById(R.id.tratamento);
         //radiobuttons escala
-        final Galeria galeria = new Galeria("cacau_pulgoes", this);
+        final Galeria galeria = new Galeria("", this);
         mImgExemplo= (ImageView) findViewById(R.id.img_exemplo);
 
         RadioButton radSev_01 = (RadioButton) findViewById(R.id.sev_01);
