@@ -88,6 +88,7 @@ public class RegistroActivity extends AppCompatActivity {
     private int contGps=0;
 
     long culturaClicada = 2;
+    int pragaClicada = 0;
     GPSTracker  gps = new GPSTracker(RegistroActivity.this);
     final String[] permissoes = new String[]{
             Manifest.permission.ACCESS_COARSE_LOCATION,
@@ -273,6 +274,7 @@ public class RegistroActivity extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 //long idPraga = listaPragas.get(i).getId();
                 registroAtual.setPragaId(i);
+                pragaClicada = i;
             }
 
             @Override

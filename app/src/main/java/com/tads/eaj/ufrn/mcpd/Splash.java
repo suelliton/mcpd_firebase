@@ -65,17 +65,17 @@ public class Splash extends AppCompatActivity {
     }
 
     public void preenchePragas(){
-        Praga p1 = new Praga(0,"Pulgões","1","2","3","4","5",1);
-        Praga p2 = new Praga(1,"Colchonilhas","1","2","3","4","5",1);
-        Praga p3 = new Praga(2,"Ácaros","1","2","3","4","5",1);
+        Praga p1 = new Praga(0,"Pulgões","1","2","3","4","5",0);
+        Praga p2 = new Praga(1,"Colchonilhas","1","2","3","4","5",0);
+        Praga p3 = new Praga(2,"Ácaros","1","2","3","4","5",0);
 
-        Praga p4 = new Praga(3,"Largatas","1","2","3","4","5",2);
-        Praga p5 = new Praga(4,"Nematóides","1","2","3","4","5",2);
-        Praga p6 = new Praga(5,"Bemicia tabasi","1","2","3","4","5",2);
+        Praga p4 = new Praga(3,"Largatas","1","2","3","4","5",1);
+        Praga p5 = new Praga(4,"Nematóides","1","2","3","4","5",1);
+        Praga p6 = new Praga(5,"Bemicia tabasi","1","2","3","4","5",1);
 
-        Praga p7 = new Praga(6,"Mosca Branca","1","2","3","4","5",3);
-        Praga p8 = new Praga(7,"Schistocerca gregaria","1","2","3","4","5",3);
-        Praga p9 = new Praga(8,"Locusta migratoria","1","2","3","4","5",3);
+        Praga p7 = new Praga(6,"Mosca Branca","1","2","3","4","5",2);
+        Praga p8 = new Praga(7,"Schistocerca gregaria","1","2","3","4","5",2);
+        Praga p9 = new Praga(8,"Locusta migratoria","1","2","3","4","5",2);
 
         pragaReference.push().setValue(p1);
         pragaReference.push().setValue(p2);
