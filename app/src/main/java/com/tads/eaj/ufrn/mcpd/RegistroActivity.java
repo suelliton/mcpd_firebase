@@ -15,10 +15,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RadioButton;
@@ -39,7 +37,6 @@ import com.tads.eaj.ufrn.mcpd.model.Cultura;
 import com.tads.eaj.ufrn.mcpd.model.Galeria;
 import com.tads.eaj.ufrn.mcpd.model.Praga;
 import com.tads.eaj.ufrn.mcpd.model.Registro;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -56,15 +53,12 @@ import static com.tads.eaj.ufrn.mcpd.ConsultaRegistrosActivity.RESULT_EXIT;
 public class RegistroActivity extends AppCompatActivity {
     //Captura de Tela
     static final int REQUEST_IMAGE_CAPTURE = 1;
-    private ImageView ivPhoto;
     private ImageButton btTakeaaPhoto;
     private ImageView mImgExemplo;
 
     private FirebaseDatabase database ;
     private DatabaseReference culturaReference;
     private DatabaseReference pragaReference;
-    private ChildEventListener childEventCultura;
-    private ChildEventListener childEventPraga;
     private ChildEventListener childEventRegistro;
     private DatabaseReference registroReference;
 
@@ -73,7 +67,6 @@ public class RegistroActivity extends AppCompatActivity {
 
     public static List<Cultura> listaCulturas;
     public static List<Praga> listaPragas;
-    List<Registro> listaRegistros  = new ArrayList<>();
 
     CulturaAdapter adaptador_cultura;
     PragaAdapter adaptador_praga;
@@ -81,7 +74,7 @@ public class RegistroActivity extends AppCompatActivity {
     private EditText tratamento;
     private RadioGroup radioGroup_escala,radioGroup_tratamento;
     private final static int REQUEST_CONSULT = 1;
-    private Button btnConsulta, btn_Gravar, btn_Sair, btn_Apontamentos, btn_Cancelar;
+    private Button btnConsulta, btn_Gravar, btn_Sair, btn_Apontamentos, btn_Cancelar,btn_Excluir;
     private Spinner spinner_cultura, spinner_praga;
     private int ID_EDIT;
     private Long ID_PROPRIEDADE;
@@ -109,7 +102,7 @@ public class RegistroActivity extends AppCompatActivity {
 
         bindViews();
         setListeners();
-        //controlaBotoes(false);
+        controlaBotoes(false);
 
         //Captura de Imagem
         btTakeaaPhoto = (ImageButton) findViewById(R.id.img_amostra);
@@ -127,7 +120,6 @@ public class RegistroActivity extends AppCompatActivity {
     public void recebePropriedade() {
         Bundle bundle = getIntent().getExtras();
         ID_PROPRIEDADE = bundle.getLong("idPropriedade");
-        Toast.makeText(this, "id propriedade = " + ID_PROPRIEDADE, Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -142,11 +134,13 @@ public class RegistroActivity extends AppCompatActivity {
         btn_Apontamentos = (Button) findViewById(R.id.btn_apontamentos);
         btn_Sair = (Button) findViewById(R.id.btn_sair);
         btn_Cancelar = (Button) findViewById(R.id.btn_cancelar);
+        btn_Excluir = (Button) findViewById(R.id.btn_excluir);
         spinner_cultura = (Spinner) findViewById(R.id.spinner_cultura);
         spinner_praga = (Spinner) findViewById(R.id.spinner_praga_dano);
         radioGroup_escala = (RadioGroup) findViewById(R.id.radioGroup_escala);
         radioGroup_tratamento= (RadioGroup) findViewById(R.id.radioGroup_tratamento);
         tratamento = (EditText) findViewById(R.id.tratamento);
+
         //radiobuttons escala
         final Galeria galeria = new Galeria("cacau_pulgoes", this);
         mImgExemplo= (ImageView) findViewById(R.id.img_exemplo);
@@ -191,11 +185,8 @@ public class RegistroActivity extends AppCompatActivity {
     public void setListeners() {
 
          listaCulturas= new ArrayList<>();
-        //joga as culturas pro adapter
          adaptador_cultura = new CulturaAdapter(this, listaCulturas);
-        //seta o adapter no spinner
         spinner_cultura.setAdapter(adaptador_cultura);
-        //recupera todas as culturas do banco
 
         childValueCultura = culturaReference.child("/Cultura").addValueEventListener(new ValueEventListener() {
             @Override
@@ -218,14 +209,9 @@ public class RegistroActivity extends AppCompatActivity {
 
 
         listaPragas= new ArrayList<>();
-        //joga as culturas pro adapter
         adaptador_praga = new PragaAdapter(this, listaPragas);
-        //seta o adapter no spinner
         spinner_praga.setAdapter(adaptador_praga);
 
-
-
-        //trata o clique na cultura do spinner
         spinner_cultura.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, final int i, long l) {
@@ -259,16 +245,8 @@ public class RegistroActivity extends AppCompatActivity {
 
             }
         }) ;
-        //preenche o spinner praga
 
-
-
-
-
-
-
-
-        //trato clique em spinner praga
+   //trato clique em spinner praga
         spinner_praga.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
@@ -276,20 +254,10 @@ public class RegistroActivity extends AppCompatActivity {
                 registroAtual.setPragaId(i);
                 pragaClicada = i;
             }
-
             @Override
             public void onNothingSelected(AdapterView<?> adapterView) {
-
             }
         });
-
-
-
-
-
-
-
-
 
         //radiobuttons tratamento
         RadioButton radio_tratamento_sim = (RadioButton) findViewById(R.id.registro_sim);
@@ -317,27 +285,10 @@ public class RegistroActivity extends AppCompatActivity {
         radioButton3.toggle();
 
 
-
-        //registroAtual.setEscala(3);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         btnConsulta.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Bundle bundle = new Bundle();
-               // bundle.putCharSequenceArrayList("list", Nomes);
                 Intent intent = new Intent(RegistroActivity.this, ConsultaRegistrosActivity.class);
                 intent.putExtras(bundle);
                 startActivityForResult(intent, REQUEST_CONSULT);
@@ -353,7 +304,7 @@ public class RegistroActivity extends AppCompatActivity {
         btn_Apontamentos.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //Aqui pode-se pegar todos os elementos da tela e apagar tudo ou nao fazer nada
+               recreate();
             }
         });
         btn_Sair.setOnClickListener(new View.OnClickListener() {
@@ -365,12 +316,17 @@ public class RegistroActivity extends AppCompatActivity {
         btn_Cancelar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(RegistroActivity.this, "Operação cancelada", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(RegistroActivity.this, RegistroActivity.class);
-                startActivity(intent);
-                finish();
+                recreate();
             }
         });
+        btn_Excluir.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                registroReference.child(registroAtual.getKey()).removeValue();
+                recreate();
+            }
+        });
+
 
     }
 
@@ -383,59 +339,6 @@ public class RegistroActivity extends AppCompatActivity {
         }
     }
 
-    public void setupGps(){
-        gps.getLocation();
-        if(!gps.isGPSEnabled){
-            if(contGps == 2){
-                finish();
-            }else {
-                Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                Toast.makeText(RegistroActivity.this, "Ative o GPS do dispositivo", Toast.LENGTH_SHORT).show();
-                startActivity(intent);
-                contGps ++;
-            }
-        }
-
-
-    }
-
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        for(int result : grantResults){
-            if(result == PackageManager.PERMISSION_DENIED){
-                alertAndFinish();
-                return;
-            }
-        }
-    }
-    private void alertAndFinish(){
-        {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle(R.string.app_name).setMessage("Para utilizar este aplicativo, você precisa aceitar as permissões.");
-            // Add the buttons
-            builder.setNegativeButton("Fechar", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    finish();
-                }
-            });
-            builder.setPositiveButton("Permitir", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int id) {
-                    Intent intent = new Intent();
-                    intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                    Uri uri = Uri.fromParts("package", getPackageName(), null);
-                    intent.setData(uri);
-                    startActivity(intent);
-                }
-            });
-            AlertDialog dialog = builder.create();
-            dialog.show();
-        }
-
-    }
-
     public void setaRegistro(int id_edit){
 
         registroAtual = REGISTRO_PARA_EDITAR;
@@ -443,8 +346,6 @@ public class RegistroActivity extends AppCompatActivity {
         EditText obs = (EditText) findViewById(R.id.observacoes);
         obs.setText(registroAtual.getObs());
         RadioButton radio;
-
-
         switch (registroAtual.getEscala()){
 
             case 1:
@@ -471,9 +372,6 @@ public class RegistroActivity extends AppCompatActivity {
                 Toast.makeText(this, "Escala inexistente", Toast.LENGTH_SHORT).show();
         }
 
-
-
-
     }
 
     @Override
@@ -491,6 +389,7 @@ public class RegistroActivity extends AppCompatActivity {
                 int id_edit = bundle.getInt("id_edit",0);
                 Log.i("id_edit",id_edit+"");
                 setaRegistro(id_edit);
+                controlaBotoes(true);
             } else if (resultCode == RESULT_EXIT) {
                 finish();
             }else if(resultCode == RESULT_CANCELED){
@@ -504,26 +403,7 @@ public class RegistroActivity extends AppCompatActivity {
         PermissionUtils.validate(this, 0, permissoes);
         //setupGps();
     }
-    public String[] converteCultura(List<Cultura> lista){
-        String[] listaConvertida = new String[lista.size()];
-        int i=0;
-        for (Cultura c: lista){
-            listaConvertida[i] = c.getNome();
-            i++;
-        }
 
-       return listaConvertida;
-    }
-    public String[] convertePraga(List<Praga> lista){
-        String[] listaConvertida = new String[lista.size()];
-        int i=0;
-        for (Praga p: lista){
-            listaConvertida[i] = p.getNome();
-            i++;
-        }
-
-        return listaConvertida;
-    }
 
    public String getDataAtual(){
        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy-\n HH:mm:ss");
@@ -591,35 +471,7 @@ public class RegistroActivity extends AppCompatActivity {
            registroReference.push().setValue(registroAtual);
            Toast.makeText(this, "Dados salvos :"+registroAtual.toString(),  Toast.LENGTH_SHORT).show();
        }else{
-
-           childEventRegistro = registroReference.child("dataRegistro").child(REGISTRO_PARA_EDITAR.getDataRegistro()).orderByChild("dataRegistro").addChildEventListener(new ChildEventListener() {
-               @Override
-               public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-
-
-               }
-
-               @Override
-               public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-               }
-
-               @Override
-               public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-               }
-
-               @Override
-               public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-               }
-
-               @Override
-               public void onCancelled(DatabaseError databaseError) {
-
-               }
-           });
-           registroReference.addChildEventListener(childEventRegistro);
+        registroReference.child(registroAtual.getKey()).push().setValue(registroAtual);
        }
    }
 
@@ -632,4 +484,80 @@ public class RegistroActivity extends AppCompatActivity {
            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
        }
    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        for(int result : grantResults){
+            if(result == PackageManager.PERMISSION_DENIED){
+                alertAndFinish();
+                return;
+            }
+        }
+    }
+
+    public void setupGps(){
+        gps.getLocation();
+        if(!gps.isGPSEnabled){
+            if(contGps == 2){
+                finish();
+            }else {
+                Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                Toast.makeText(RegistroActivity.this, "Ative o GPS do dispositivo", Toast.LENGTH_SHORT).show();
+                startActivity(intent);
+                contGps ++;
+            }
+        }
+
+
+    }
+
+
+
+    private void alertAndFinish(){
+        {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle(R.string.app_name).setMessage("Para utilizar este aplicativo, você precisa aceitar as permissões.");
+            // Add the buttons
+            builder.setNegativeButton("Fechar", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    finish();
+                }
+            });
+            builder.setPositiveButton("Permitir", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    Intent intent = new Intent();
+                    intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                    Uri uri = Uri.fromParts("package", getPackageName(), null);
+                    intent.setData(uri);
+                    startActivity(intent);
+                }
+            });
+            AlertDialog dialog = builder.create();
+            dialog.show();
+        }
+
+    }
+
+
+   /* public String[] converteCultura(List<Cultura> lista){
+        String[] listaConvertida = new String[lista.size()];
+        int i=0;
+        for (Cultura c: lista){
+            listaConvertida[i] = c.getNome();
+            i++;
+        }
+
+       return listaConvertida;
+    }
+    public String[] convertePraga(List<Praga> lista){
+        String[] listaConvertida = new String[lista.size()];
+        int i=0;
+        for (Praga p: lista){
+            listaConvertida[i] = p.getNome();
+            i++;
+        }
+
+        return listaConvertida;
+    }*/
 }
