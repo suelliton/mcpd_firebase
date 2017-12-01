@@ -87,7 +87,7 @@ public class RegistroActivity extends AppCompatActivity {
     private Long ID_PROPRIEDADE;
     private int contGps=0;
 
-    long culturaClicada = 2;
+    int culturaClicada = 2;
     int pragaClicada = 0;
     GPSTracker  gps = new GPSTracker(RegistroActivity.this);
     final String[] permissoes = new String[]{
@@ -155,35 +155,45 @@ public class RegistroActivity extends AppCompatActivity {
         radSev_01.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mImgExemplo.setImageBitmap(galeria.getImage(1));
+                mImgExemplo.setImageBitmap(galeria.getImage(1,
+                        listaCulturas.get(culturaClicada).getNome(),
+                        listaPragas.get(culturaClicada).getNome()));
             }
         });
         RadioButton radSev_02 = (RadioButton) findViewById(R.id.sev_02);
         radSev_02.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mImgExemplo.setImageBitmap(galeria.getImage(2));
+                mImgExemplo.setImageBitmap(galeria.getImage(2,
+                        listaCulturas.get(culturaClicada).getNome(),
+                        listaPragas.get(culturaClicada).getNome()));
             }
         });
         RadioButton radSev_03 = (RadioButton) findViewById(R.id.sev_03);
         radSev_03.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mImgExemplo.setImageBitmap(galeria.getImage(3));
+                mImgExemplo.setImageBitmap(galeria.getImage(3,
+                        listaCulturas.get(culturaClicada).getNome(),
+                        listaPragas.get(culturaClicada).getNome()));
             }
         });
         RadioButton radSev_04 = (RadioButton) findViewById(R.id.sev_04);
         radSev_04.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mImgExemplo.setImageBitmap(galeria.getImage(4));
+                mImgExemplo.setImageBitmap(galeria.getImage(4,
+                        listaCulturas.get(culturaClicada).getNome(),
+                        listaPragas.get(culturaClicada).getNome()));
             }
         });
         RadioButton radSev_05 = (RadioButton) findViewById(R.id.sev_05);
         radSev_05.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mImgExemplo.setImageBitmap(galeria.getImage(5));
+                mImgExemplo.setImageBitmap(galeria.getImage(5,
+                        listaCulturas.get(culturaClicada).getNome(),
+                        listaPragas.get(culturaClicada).getNome()));
             }
         });
     }
