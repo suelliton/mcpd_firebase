@@ -36,6 +36,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:textColor="@color/preto"
                 android:layout_weight="1"
                 android:text="esc.|" />
 
@@ -65,6 +66,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_weight="1"
+                android:textColor="@color/preto"
                 android:text="Data-Hora" />
         </LinearLayout>
 
@@ -91,6 +93,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_weight="1"
+                android:textColor="@color/preto"
                 android:text="Cultura" />
 
         </LinearLayout>
@@ -117,6 +120,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_weight="1"
+                android:textColor="@color/preto"
                 android:text="Praga" />
         </LinearLayout>
 <!--
